@@ -33,11 +33,9 @@ services:
       front_net:
         aliases:
           - comment
+
   prometheus:
     image: ${USER_NAME}/prometheus
-    networks:
-      - back_net:
-      - front_net:
     ports:
       - 9090:9090
     volumes:
@@ -46,6 +44,10 @@ services:
       - '--config.file=/etc/prometheus/prometheus.yml'
       - '--storage.tsdb.path=/prometheus'
       - '--storage.tsdb.retention=1d'
+    networks:
+      - front_net
+      - back_net
+
   node-exporter:
     image: prom/node-exporter:${NODE_EXPORTER_VERSION}
     user: root
@@ -61,17 +63,13 @@ services:
       - front_net
       - back_net
 
-  volumes:
-    post_db:
-    prometheus_data:
-
   networks:
     back_net:
       ipam:
         config:
-          - subnet: ${BACKNET}
+          - subnet: 10.0.2.0/24
     front_net:
       ipam:
         config:
-          - subnet: ${FRONTNET}
+          - subnet: 10.0.1.0/24
 
