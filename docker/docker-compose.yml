@@ -3,7 +3,7 @@ services:
   post_db:
     image: mongo:${MONGO_VERSION}
     volumes:
-      - post_db:${POST_SERVICE_VOLUME_PATH}
+      - post_db:/data/db
     networks:
       back_net:
         aliases:
@@ -12,32 +12,31 @@ services:
   ui:
     image: ${USER_NAME}/ui:${UI_VERSION}
     ports:
-      - 9292:9292/tcp
+            - 9292:9292/tcp
     networks:
       - front_net
   post:
     image: ${USER_NAME}/post:${POST_VERSION}
     networks:
-      back_net:
+      front_net:
         aliases:
           - post
-      front_net:
+      back_net:
         aliases:
           - post
   comment:
     image: ${USER_NAME}/comment:${COMMENT_VERSION}
     networks:
-      back_net:
-        aliases:
-          - comment
       front_net:
         aliases:
           - comment
-
+      back_net:
+        aliases:
+          - comment
   prometheus:
     image: ${USER_NAME}/prometheus
     ports:
-      - 9090:9090
+      - 9090:9090/tcp
     volumes:
       - prometheus_data:/prometheus
     command:
@@ -47,9 +46,8 @@ services:
     networks:
       - front_net
       - back_net
-
   node-exporter:
-    image: prom/node-exporter:${NODE_EXPORTER_VERSION}
+    image: prom/node-exporter:v0.15.2
     user: root
     volumes:
       - /proc:/host/proc:ro
@@ -62,4 +60,18 @@ services:
     networks:
       - front_net
       - back_net
+
+volumes:
+  post_db:
+  prometheus_data:
+
+networks:
+  back_net:
+    ipam:
+      config:
+        - subnet: 10.0.2.0/24
+  front_net:
+    ipam:
+      config:
+        - subnet: 10.0.1.0/24
 
