@@ -1,47 +1,43 @@
 version: '3.3'
 services:
   post_db:
-    image: mongo:${MONGO_SERVICE_VERSION}
+    image: mongo:${MONGO_VERSION}
     volumes:
       - post_db:${POST_SERVICE_VOLUME_PATH}
     networks:
       back_net:
-       aliases:
-       - post_db
-       - comment_db
+        aliases:
+          - post_db
+          - comment_db
   ui:
-    image: ${USER_NAME}/ui:${UI_SERVICE_VERSION}
+    image: ${USER_NAME}/ui:${UI_VERSION}
     ports:
       - ${UI_SERVICE_PORT}:${UI_SERVICE_PORT}/tcp
     networks:
       - front_net
   post:
-    image: ${USER_NAME}/post:${POST_SERVICE_VERSION}
+    image: ${USER_NAME}/post:${POST_VERSION}
     networks:
       back_net:
-       aliases:
-       - comment
+        aliases:
+          - post
       front_net:
-       aliases:
-       - comment
+        aliases:
+          - post
   comment:
-    image: ${USER_NAME}/comment:${COMMENT_SERVICE_VERSION}
+    image: ${USER_NAME}/comment:${COMMENT_VERSION}
     networks:
       back_net:
-       aliases:
-       - post
+        aliases:
+          - comment
       front_net:
-       aliases:
-       - post
+        aliases:
+          - comment
   prometheus:
     image: ${USER_NAME}/prometheus
     networks:
-      back_net:
-       aliases:
-       - prometheus
-      front_net:
-       aliases:
-       - prometheus
+      - back_net:
+      - front_net:
     ports:
       - 9090:9090
     volumes:
@@ -53,10 +49,6 @@ services:
   node-exporter:
     image: prom/node-exporter:${NODE_EXPORTER_VERSION}
     user: root
-    networks:
-      back_net:
-       aliases:
-       - node_exporter
     volumes:
       - /proc:/host/proc:ro
       - /sys:/host/sys:ro
@@ -65,6 +57,10 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
+    networks:
+      - front_net
+      - back_net
+
   volumes:
     post_db:
     prometheus_data:
@@ -73,8 +69,9 @@ services:
     back_net:
       ipam:
         config:
-          - subnet: 10.0.2.0/24
+          - subnet: ${BACKNET}
     front_net:
       ipam:
         config:
-          - subnet: 10.0.1.0/24
+          - subnet: ${FRONTNET}
+
