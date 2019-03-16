@@ -12,7 +12,7 @@ services:
   ui:
     image: ${USER_NAME}/ui:${UI_VERSION}
     ports:
-      - ${UI_SERVICE_PORT}:${UI_SERVICE_PORT}/tcp
+      - 9292:9292/tcp
     networks:
       - front_net
   post:
