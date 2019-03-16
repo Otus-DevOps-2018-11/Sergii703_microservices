@@ -65,29 +65,6 @@ services:
       - '--path.procfs=/host/proc'
       - '--path.sysfs=/host/sys'
       - '--collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"'
-  mongodb-exporter:
-    image: ${USER_NAME}/mongodb_exporter:${MONGODB_EXPORTER_VERSION}
-    command:
-      - --collect.database
-      - --collect.collection
-      - --mongodb.uri=[mongodb://post_db:27017]
-    ports:
-      - 9216:9216
-    networks:
-      back_net:
-       aliases:
-       - mongodb_exporter
-  blackbox-exporter:
-    image: ${USER_NAME}/blackbox_exporter:${BLACKBOX_EXPORTER_VERSION}
-    ports:
-      - 9115:9115
-    networks:
-      back_net:
-       aliases:
-       - blackbox_exporter
-      front_net:
-       aliases:
-       - blackbox_exporter
   volumes:
     post_db:
     prometheus_data:
