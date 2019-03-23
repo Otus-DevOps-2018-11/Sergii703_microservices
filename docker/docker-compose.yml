@@ -15,7 +15,17 @@ services:
             - 9292:9292/tcp
     networks:
       - front_net
+    logging:
+       driver: "fluentd"
+       options:
+         fluentd-address: localhost:24224
+         tag: service.ui
   post:
+    logging:
+       driver: "fluentd"
+       options:
+         fluentd-address: localhost:24224
+         tag: service.post 
     image: ${USER_NAME}/post:${POST_VERSION}
     networks:
       front_net:
