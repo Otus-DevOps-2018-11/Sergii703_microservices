@@ -1,3 +1,4 @@
+i
 ---
 apiVersion: apps/v1beta2
 kind: Deployment
@@ -22,4 +23,6 @@ spec:
       containers:
       - image: ${USER_NAME}/post
         name: post
-
+        env:
+          - name: POST_DATABASE_HOST
+            value: post_db
